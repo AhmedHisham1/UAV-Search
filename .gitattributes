@@ -3,7 +3,6 @@ map filter=lfs diff=lfs merge=lfs -text
 mavsdk_utils.py filter=lfs diff=lfs merge=lfs -text
 planning_utils.py filter=lfs diff=lfs merge=lfs -text
 playground.py filter=lfs diff=lfs merge=lfs -text
-README.md filter=lfs diff=lfs merge=lfs -text
 utils filter=lfs diff=lfs merge=lfs -text
 cv_utils.py filter=lfs diff=lfs merge=lfs -text
 main.py filter=lfs diff=lfs merge=lfs -text
