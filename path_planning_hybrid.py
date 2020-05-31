@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
+from map_plot import osm_plot
 
 NUM_THETA_CELLS = 45
-GRID_SIZE = 300
+GRID_SIZE = 100
 lats = np.linspace(38.1598, 38.163, num=GRID_SIZE, endpoint=True)
 longs = np.linspace(-122.457, -122.451, num=GRID_SIZE, endpoint=True)
 
@@ -90,7 +91,7 @@ def button_callback(event):
     ax.scatter(pp[:,0], pp[:,1])
     plt.draw()
 
-def bicycle(state, delta_rad, speed=2*1e-5, length=10*1e-5):
+def bicycle(state, delta_rad, speed=8*1e-5, length=10*1e-5):
     next_yaw = state.yaw + speed/length * np.tan(delta_rad)
     if next_yaw < 0 or next_yaw > 2*np.pi: next_yaw = (next_yaw + 2*np.pi) % (2*np.pi)
     next_long = state.long + speed*np.cos(state.yaw)
@@ -109,10 +110,11 @@ def expand(state, goal):
     Returns a list of possible next states for a range of steering angles.
     '''
     next_states = []
-    for delta in range(35,-35+5,-5):
+    for delta in range(15,-15-5,-5):
         next_long, next_lat, next_yaw = bicycle(state, delta*np.pi/180)
         next_g = state.g + 1
         next_f = next_g + heuristic(State(long=next_long, lat=next_lat, yaw=next_yaw, g=next_g), goal)
+        # Avoiding creating states that are outside the grid boundries to avoid errors of indexing.
         if (next_lat >= 38.1598 and next_lat <= 38.163) and (next_long >= -122.457 and next_long <= -122.451):
             next_states.append(State(next_long, next_lat, next_yaw, next_g, next_f, parent=state))
     
@@ -147,6 +149,7 @@ def search(grid, start, goal, visualize=False):
     closed[stack_number][state.x][state.y] = 1
 
     if visualize:
+        plt.figure()
         plt.show()
         plt.grid(b=True, which='major', color='#666666', linestyle='-')
         plt.minorticks_on()
@@ -199,7 +202,7 @@ def discretize_world(home_loc, goal_loc):
     goal_grid = np.nonzero(lats>=goal_loc[0])[0][0], np.nonzero(longs>=goal_loc[1])[0][0]
     return grid, home_grid, goal_grid
 
-def planned_path(home_loc_, goal_loc_, home_yaw=0):
+def planned_path(home_loc_, goal_loc_, home_yaw=np.deg2rad(0)):
     global pp, grid, home_grid, goal_grid, home_loc, goal_loc, ax, start_yaw, path_c
     start_yaw = home_yaw
     home_loc = home_loc_
@@ -227,15 +230,16 @@ def planned_path(home_loc_, goal_loc_, home_yaw=0):
     ax.minorticks_on()
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
     plt.show()
-    
+
+    osm_plot(path_c)
     return path_c
 
 if __name__ == "__main__":
     home_loc = [38.161437, -122.454534]
-    home_yaw = np.deg2rad(270)
     goal_loc = [38.16210, -122.45653]
+    # goal_loc = [38.160, -122.452073]
 
-    path = planned_path(home_loc, goal_loc, home_yaw)
+    path = planned_path(home_loc, goal_loc)
     plt.plot(path[:, 1], path[:, 0], '--g')
     plt.scatter(path[:, 1], path[:, 0])
     # plt.tick_params('both', length=2, width=1, which='major')
