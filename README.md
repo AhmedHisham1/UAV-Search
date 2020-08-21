@@ -24,3 +24,5 @@ This project is done as part of my graduation project as a senior aerospace engi
     - Currently implements localization based on the simple triangle-similarity method, assumming the camera is always facing directly downwards.
     - Located objects pixel center is transformed into the global coordinates, based on the UAV location at the time of capturing the image and the yaw angle of the UAV.
 
+## Clone Notes
+- This repository contains some files that are tracked by "git-lfs" (git large file system). To clone the full version of these files you need to `git clone <repo-link>` then navigate to the repo directory and `git lfs pull` to pull the full version of the lfs tracked files into your directory.
